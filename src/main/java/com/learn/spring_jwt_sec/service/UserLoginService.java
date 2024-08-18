@@ -25,6 +25,7 @@ public class UserLoginService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserLogin user = this.userLoginRepository.findByClientName(username);
         log.info("user: {}",user);
+        if (user==null) throw new UsernameNotFoundException("User name not found");
         return User.builder()
                 .username(user.getClientName())
                 .password(user.getClientSecret())
