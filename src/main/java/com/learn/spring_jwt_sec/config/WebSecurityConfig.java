@@ -1,6 +1,8 @@
 package com.learn.spring_jwt_sec.config;
 
+import com.learn.spring_jwt_sec.security.CustomAccessDeniedHandlerFilter;
 import com.learn.spring_jwt_sec.security.CustomAuthProvider;
+import com.learn.spring_jwt_sec.security.CustomAuthenticationErrorFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,6 +36,12 @@ public class WebSecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private CustomAuthenticationErrorFilter customAuthenticationErrorFilter;
+
+    @Autowired
+    private CustomAccessDeniedHandlerFilter customAccessDeniedHandlerFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // h2-DB settings
@@ -48,7 +56,10 @@ public class WebSecurityConfig {
             requests.requestMatchers("/auth/sign").permitAll();
             requests.anyRequest().authenticated();
         });
-
+        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
+            httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationErrorFilter);
+            httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(customAccessDeniedHandlerFilter);
+        });
         http.sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER));
         http.httpBasic(Customizer.withDefaults());
 

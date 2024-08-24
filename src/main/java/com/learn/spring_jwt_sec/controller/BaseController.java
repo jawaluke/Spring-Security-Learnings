@@ -2,6 +2,7 @@ package com.learn.spring_jwt_sec.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,14 +21,15 @@ public class BaseController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public String user() {
+    public String user(Authentication authentication) {
+        log.info("SEC: {}",authentication.toString());
         return "this is user api";
     }
 
     @GetMapping("/admin")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String admin() {
-        log.info("sec: {}",SecurityContextHolder.getContext().getAuthentication());
+        log.info("SEC: {}",SecurityContextHolder.getContext().getAuthentication());
         return "this is admin api";
     }
 
